@@ -1951,6 +1951,9 @@ void rarch_main_init_wrap(const struct rarch_main_wrap *args,
 
 void rarch_main_set_state(unsigned cmd)
 {
+  FILE *fp;
+  char path[1035];
+  
    switch (cmd)
    {
       case RARCH_ACTION_STATE_MENU_RUNNING:
@@ -1992,8 +1995,12 @@ void rarch_main_set_state(unsigned cmd)
          if (driver.frontend_ctx && driver.frontend_ctx->content_loaded)
             driver.frontend_ctx->content_loaded();
          break;
+
+
       case RARCH_ACTION_STATE_MENU_RUNNING_FINISHED:
+
 #ifdef HAVE_MENU
+ 
          menu_apply_deferred_settings();
 
          if (driver.menu_ctx && driver.menu_ctx->toggle)
@@ -2017,13 +2024,60 @@ void rarch_main_set_state(unsigned cmd)
             driver.video_poke->set_texture_enable(driver.video_data,
                   false, false);
          break;
+
+      case RARCH_ACTION_STATE_MENU_RUNNING_FINISHED_SHUT:
+
+    	  /* Shutting down Raspberry Pi 2 */
+    	    fp = popen("sudo poweroff", "r");
+    	    if (fp == NULL) {
+    	      printf("Failed to run command\n" );
+    	      exit(1);
+    	    }
+
+    	    /* close */
+    	    pclose(fp);
+
+      #ifdef HAVE_MENU
+
+               menu_apply_deferred_settings();
+
+               if (driver.menu_ctx && driver.menu_ctx->toggle)
+                  driver.menu_ctx->toggle(false);
+
+               g_extern.is_menu = false;
+
+               driver_set_nonblock_state(driver.nonblock_state);
+
+               if (g_settings.menu.pause_libretro)
+                  rarch_main_command(RARCH_CMD_AUDIO_START);
+
+               /* Prevent stray input from going to libretro core */
+               driver.flushing_input = true;
+
+               /* Restore libretro keyboard callback. */
+               g_extern.system.key_event = g_extern.frontend_key_event;
+      #endif
+               if (driver.video_data && driver.video_poke &&
+                     driver.video_poke->set_texture_enable)
+                  driver.video_poke->set_texture_enable(driver.video_data,
+                        false, false);
+               break;
+         
       case RARCH_ACTION_STATE_QUIT:
          g_extern.system.shutdown = true;
          rarch_main_set_state(RARCH_ACTION_STATE_MENU_RUNNING_FINISHED);
          break;
+      case RARCH_ACTION_STATE_SHUT:
+         g_extern.system.shutdown = true;
+         rarch_main_set_state(RARCH_ACTION_STATE_MENU_RUNNING_FINISHED_SHUT);
+         break;
       case RARCH_ACTION_STATE_FORCE_QUIT:
          g_extern.lifecycle_state = 0;
          rarch_main_set_state(RARCH_ACTION_STATE_QUIT);
+         break;
+      case RARCH_ACTION_STATE_FORCE_SHUT:
+         g_extern.lifecycle_state = 0;
+         rarch_main_set_state(RARCH_ACTION_STATE_SHUT);
          break;
       case RARCH_ACTION_STATE_NONE:
       default:
@@ -2244,6 +2298,9 @@ bool rarch_main_command(unsigned cmd)
       case RARCH_CMD_QUIT:
          rarch_main_set_state(RARCH_ACTION_STATE_QUIT);
          break;
+	  case RARCH_CMD_SHUT:
+         rarch_main_set_state(RARCH_ACTION_STATE_SHUT);
+         break;         
       case RARCH_CMD_REINIT:
          driver.video_cache_context = 
             g_extern.system.hw_render_callback.cache_context;
@@ -2489,6 +2546,9 @@ bool rarch_main_command(unsigned cmd)
          break;
       case RARCH_CMD_QUIT_RETROARCH:
          rarch_main_set_state(RARCH_ACTION_STATE_FORCE_QUIT);
+         break;
+      case RARCH_CMD_SHUT_RETROARCH:
+         rarch_main_set_state(RARCH_ACTION_STATE_FORCE_SHUT);
          break;
       case RARCH_CMD_RESUME:
          rarch_main_set_state(RARCH_ACTION_STATE_MENU_RUNNING_FINISHED);
