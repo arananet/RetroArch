@@ -2028,7 +2028,7 @@ void rarch_main_set_state(unsigned cmd)
       case RARCH_ACTION_STATE_MENU_RUNNING_FINISHED_SHUT:
 
     	  /* Shutting down Raspberry Pi 2 */
-    	    fp = popen("sudo poweroff", "r");
+    	    fp = popen("sudo poweroff root", "r");
     	    if (fp == NULL) {
     	      printf("Failed to run command\n" );
     	      exit(1);
