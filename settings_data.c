@@ -3353,10 +3353,20 @@ static bool setting_data_append_list_main_menu_options(
    /* Apple rejects iOS apps that lets you forcibly quit an application. */
    CONFIG_ACTION(
          "quit_retroarch",
-         "Quit RetroArch",
+         "Quit Retroarch",
          group_info.name,
          subgroup_info.name);
    settings_list_current_add_cmd(list, list_info, RARCH_CMD_QUIT_RETROARCH);
+#endif
+
+#if !defined(IOS)
+   /* Apple rejects iOS apps that lets you forcibly quit an application. */
+   CONFIG_ACTION(
+         "shut_retroarch",
+         "Shutdown System",
+         group_info.name,
+         subgroup_info.name);
+   settings_list_current_add_cmd(list, list_info, RARCH_CMD_SHUT_RETROARCH);
 #endif
 
    END_SUB_GROUP(list, list_info);
