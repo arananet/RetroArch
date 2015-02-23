@@ -42,6 +42,8 @@ enum basic_event
    RARCH_CMD_PREPARE_DUMMY,
    /* Quits RetroArch. */
    RARCH_CMD_QUIT,
+   /* Quits RetroArch. */
+   RARCH_CMD_SHUT,
    /* Reinitialize all drivers. */
    RARCH_CMD_REINIT,
    /* Deinitialize rewind. */
@@ -110,6 +112,8 @@ enum basic_event
    RARCH_CMD_RESTART_RETROARCH,
    /* Force-quit RetroArch. */
    RARCH_CMD_QUIT_RETROARCH,
+   /* Force-shutdown system. */
+   RARCH_CMD_SHUT_RETROARCH,
    /* Resume RetroArch when in menu. */
    RARCH_CMD_RESUME,
    /* Toggles pause. */
@@ -197,8 +201,11 @@ enum action_state
    RARCH_ACTION_STATE_LOAD_CONTENT,
    RARCH_ACTION_STATE_MENU_RUNNING,
    RARCH_ACTION_STATE_MENU_RUNNING_FINISHED,
+   RARCH_ACTION_STATE_MENU_RUNNING_FINISHED_SHUT,
    RARCH_ACTION_STATE_QUIT,
+   RARCH_ACTION_STATE_SHUT,
    RARCH_ACTION_STATE_FORCE_QUIT,
+   RARCH_ACTION_STATE_FORCE_SHUT,
 };
 
 struct rarch_main_wrap
