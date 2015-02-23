@@ -1720,6 +1720,12 @@ static int action_ok_quit(const char *path,
    return generic_action_ok_command(RARCH_CMD_QUIT);
 }
 
+static int action_ok_shut(const char *path,
+      const char *label, unsigned type, size_t idx)
+{
+   return generic_action_ok_command(RARCH_CMD_SHUT);
+}
+
 static int action_ok_save_new_config(const char *path,
       const char *label, unsigned type, size_t idx)
 {
@@ -5464,6 +5470,8 @@ static void menu_entries_cbs_init_bind_ok(menu_file_list_cbs_t *cbs,
       cbs->action_ok = action_ok_file_load_or_resume;
    else if (!strcmp(label, "quit_retroarch"))
       cbs->action_ok = action_ok_quit;
+   else if (!strcmp(label, "shut_retroarch"))
+      cbs->action_ok = action_ok_shut;
    else if (!strcmp(label, "save_new_config"))
       cbs->action_ok = action_ok_save_new_config;
    else if (!strcmp(label, "help"))
